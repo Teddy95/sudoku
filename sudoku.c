@@ -103,6 +103,7 @@ int countEmptyFields(struct sudoku sudokuGrid);
 int checkSavegameSlot(int slot);
 struct savegame readSavegame(int slot, int *error);
 int writeSavegame(struct savegame sudoku, int slot);
+void deleteSavegame(int slot);
 // Zeitfunktionen
 struct time getPastTime(double time);
 // Ausgabe-/Viewfunktionen
@@ -110,6 +111,7 @@ int showView(int view);
 int viewHome();
 int viewGameNew();
 int viewGameLoad();
+int viewGameDelete();
 int viewGamePlay(struct savegame sudoku);
 int viewGameSave(struct savegame sudoku);
 int viewCredits();
@@ -607,19 +609,19 @@ int checkGroup(struct sudoku sudokuGrid, struct field field) {
  * Beschreibung:    Prüft ob ein Wert im Sudoku richtig gesetzt wurde.
  */
 int charToInt(char charakter) {
-    int callback = 0;
+    int result = 0;
 
     if (charakter >= 65 && charakter <= 73) {
         // Großbuchstabe A - I -> ASCII Code von A subtrahieren
-        callback = charakter - 65;
+        result = charakter - 65;
     } else if (charakter >= 97 && charakter <= 105) {
         // Kleinbuchstabe a - i -> ASCII Code von a subtrahieren
-        callback = charakter - 97;
+        result = charakter - 97;
     } else {
-        callback--;
+        result--;
     }
 
-    return callback;
+    return result;
 }
 
 /**
@@ -632,8 +634,8 @@ int charToInt(char charakter) {
  * Beschreibung:    Prüft und konvertiert eine eingegebene Zeichenkette.
  */
 int checkAndConvertInputToInt(char inputString[]) {
-    int i, strLen, charakter, callback;
-    callback = 0;
+    int i, strLen, charakter, result;
+    result = 0;
     strLen = strlen(inputString);
 
     for (i = 0; i < strLen; i++) {
@@ -643,11 +645,11 @@ int checkAndConvertInputToInt(char inputString[]) {
         }
 
         // Wert mit 10 multiplizieren und neue Zahl addieren -> z.B. 125 = (((((0*10)+1)*10)+2)*10)+5
-        callback *= 10;
-        callback += inputString[i] - '0';
+        result *= 10;
+        result += inputString[i] - '0';
     }
 
-    return callback;
+    return result;
 }
 
 /**
@@ -951,6 +953,25 @@ int writeSavegame(struct savegame sudoku, int slot) {
 }
 
 /**
+ * Funktion:        deleteSavegame
+ *
+ * Parameter:       slot (int) -> Speicherstand
+ *
+ * Beschreibung:    Löscht einen Speicherstand (Slot) -> Löscht die Datei.
+ */
+void deleteSavegame(int slot) {
+	char fileName[12] = "slot0.skram\0";
+    fileName[4] = (slot - 1) + '0';
+
+	if (unlink(fileName) < 0) {
+		// Darf nicht auftreten
+		die();
+	}
+
+	return;
+}
+
+/**
  * Funktion:        getPastTime
  *
  * Parameter:       time (double) -> Savegame-Struktur, in dem der aktuelle Spielfortschritt, die Lösung und die bislang benötigte Zeit enthalten ist
@@ -960,7 +981,7 @@ int writeSavegame(struct savegame sudoku, int slot) {
  * Beschreibung:    Wandelt Sekunden in Stunden, Minuten und Sekunden um.
  */
 struct time getPastTime(double time) {
-    struct time callback;
+    struct time result;
     double hours, minutes, seconds;
 
     // Berechnung von Stunden, Minuten und Sekunden
@@ -969,11 +990,11 @@ struct time getPastTime(double time) {
     seconds = floor((int) time % 60);
 
     // Werte zu Ganzzahlen casten und in die Rückgabestruktur schreiben
-    callback.hours = (int) hours;
-    callback.minutes = (int) minutes;
-    callback.seconds = (int) seconds;
+    result.hours = (int) hours;
+    result.minutes = (int) minutes;
+    result.seconds = (int) seconds;
 
-    return callback;
+    return result;
 }
 
 /**
@@ -1135,8 +1156,9 @@ int viewGameNew() {
  * Beschreibung:    Zeigt den Bildschirm an, um ein Spiel zu laden.
  */
 int viewGameLoad() {
-    int i, input, errorInput, noSavegame;
+    int i, input, deletedSlot, errorInput, noSavegame;
     char inputString[STRLEN];
+    deletedSlot = 0;
     errorInput = 0;
     noSavegame = 0;
 
@@ -1156,23 +1178,36 @@ int viewGameLoad() {
             }
         }
 
-        printf("[11] Zurueck zum Startbildschirm\n");
+        printf("\n");
+        printf("[11] Spielstand loeschen\n");
+        printf("[12] Zurueck zum Startbildschirm\n");
         printf("\n");
 
-        if (errorInput == 1) {
-            printf("Die Eingabe war Fehlerhaft, bitte erneut eingeben!\n");
+        if (deletedSlot > 0) {
+        	printf("Spielstand %d wurde erfolgreich geloescht!\n", deletedSlot);
+        	deletedSlot = 0;
         } else {
-            if (noSavegame == 1) {
-                printf("Dieser Spielstand ist nicht vorhanden!\n");
-            }
+        	if (errorInput == 1) {
+        	    printf("Die Eingabe war Fehlerhaft, bitte erneut eingeben!\n");
+        	} else {
+        	    if (noSavegame == 1) {
+        	        printf("Dieser Spielstand ist nicht vorhanden!\n");
+        	    }
+        	}
         }
 
         printf("Eingabe: ");
         readLine(inputString);
         input = checkAndConvertInputToInt(inputString);
 
-        // Bei der Eingabe 11 soll zum Startbildschirm gewechselt werden
+        // Bei der Eingabe 11 soll ein Spielstand gelöscht werden
         if (input == 11) {
+        	deletedSlot = viewGameDelete();
+        	continue;
+        }
+
+        // Bei der Eingabe 12 soll zum Startbildschirm gewechselt werden
+        if (input == 12) {
             return VIEW_HOME;
         }
 
@@ -1201,6 +1236,75 @@ int viewGameLoad() {
 
     // Aus dem Speicherstand gelesenes Sudoku an den Play-View weitergeben und dessen Rückgabewert zurückgeben
     return viewGamePlay(sudoku);
+}
+
+/**
+ * Funktion:        viewGameDelete
+ *
+ * Rückgabewert:    Gibt die Slotnummer des gelöschten Spielstandes zurück
+ *
+ * Beschreibung:    Zeigt den Bildschirm an, um ein Spiel zu löschen.
+ */
+int viewGameDelete () {
+	int i, input, errorInput, noSavegame;
+    char inputString[STRLEN];
+    errorInput = 0;
+    noSavegame = 0;
+
+    // Wiederholt die Anzeige des Bildschirms um ein gespeichertes Spiel zu loeschen so oft, bis eine gültige Eingabe erfolgt ist
+    do {
+        system("cls");
+        printf("SKRAM Sudoku\n");
+        printf("\n");
+        printf("Spielstand loeschen\n");
+
+        // Listet Spielstände 1 - 10 (0 - 9)
+        for (i = 1; i <= 10; i++) {
+            if (checkSavegameSlot(i)) {
+                printf("[%d] Spielstand %d\n", i, i);
+            } else {
+                printf("[%d] Nicht vorhanden\n", i);
+            }
+        }
+
+        printf("\n");
+        printf("[11] Abbrechen\n");
+        printf("\n");
+
+        if (errorInput == 1) {
+            printf("Die Eingabe war Fehlerhaft, bitte erneut eingeben!\n");
+        } else {
+            if (noSavegame == 1) {
+                printf("Dieser Spielstand ist nicht vorhanden!\n");
+            }
+        }
+
+        printf("Eingabe: ");
+        readLine(inputString);
+        input = checkAndConvertInputToInt(inputString);
+
+        // Bei der Eingabe 11 soll abgebrochen
+        if (input == 11) {
+        	return 0;
+        }
+
+        if (input < 1 || input > 10) {
+            errorInput = 1;
+        } else {
+            errorInput = 0;
+        }
+
+        // Prüft, ob ausgewählter Spielstand verfügbar ist
+        if (!checkSavegameSlot(input)) {
+            noSavegame = 1;
+        }
+    } while (input < 1 || input > 10 || !checkSavegameSlot(input));
+
+    // Spielstand löschen
+    deleteSavegame(input);
+
+    // Nummer des gelößchten Spielstandes zurückgeben
+    return input;
 }
 
 /**
