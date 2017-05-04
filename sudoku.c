@@ -1,5 +1,4 @@
 /*
- * © 2017 Andre Sieverding
  * SKRAM Sudoku
  *
  * Funktionsumfang:
@@ -12,8 +11,8 @@
  * - Nach jedem Zug wird das Sudoku im Hintergrund geprüft
  * - Sobald das Sudoku vollständig und korrekt gelöst wurde, wird eine entsprechende Nachricht angezeigt
  *
- * Kompiliert mit: MinGW, GNU GCC
- * Getestet auf OS: Windows 10, MacOS Sierra 12.0
+ * Kompiliert mit: MinGW
+ * Getestet auf OS: Windows 10
  */
 
 #include <stdio.h>
@@ -206,6 +205,27 @@ struct sudoku generateFullSudoku() {
     }
 
     return sudokuGrid;
+
+    /*
+    int i, j;
+    struct sudoku sudokuGrid;
+    struct field field;
+
+    for (i = 0; i < SIZE; i++) {
+    	field.row = i;
+
+    	for (j = 0; j < SIZE; j++) {
+    		field.column = j;
+    		sudokuGrid.generated[i][j] = 1;
+
+    		do {
+    			sudokuGrid.value[i][j] = rand() % 9 + 1;
+    		} while (!checkValue(sudokuGrid, field));
+    	}
+    }
+
+    return sudokuGrid;
+    */
 }
 
 /**
