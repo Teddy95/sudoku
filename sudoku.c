@@ -37,6 +37,7 @@
 #define VIEW_GAME_SAVE 4
 #define VIEW_CREDITS 5
 #define VIEW_EXIT 6
+#define VIEW_GAME_READ 7
 
 // Definition von Konstante für maximale Zeichenkettenlänge
 #define STRLEN 255
@@ -114,6 +115,7 @@ int viewGameLoad();
 int viewGameDelete();
 int viewGamePlay(struct savegame sudoku);
 int viewGameSave(struct savegame sudoku);
+int viewGameReadFromSudokuFile();
 int viewCredits();
 void printGrid(struct sudoku sudokuGrid);
 
@@ -1056,12 +1058,12 @@ int viewHome() {
         readLine(inputString);
         input = checkAndConvertInputToInt(inputString);
 
-        if (input < 1 || input > 4) {
+        if (input < 1 || input > 5) {
             errorInput = 1;
         } else {
             errorInput = 0;
         }
-    } while (input < 1 || input > 4);
+    } while (input < 1 || input > 5);
 
     switch (input) {
         case 1:
@@ -1074,6 +1076,9 @@ int viewHome() {
             return VIEW_CREDITS;
 
         case 4:
+            return VIEW_GAME_READ;
+
+        case 5:
             return VIEW_EXIT;
     }
 
@@ -1518,6 +1523,34 @@ int viewGameSave(struct savegame sudoku) {
     }
 
     return 1;
+}
+
+/**
+ * Funktion:        viewGameReadFromSudokuFile
+ *
+ * Rückgabewert:    xxx
+ *
+ * Beschreibung:    xxx.
+ */
+int viewGameReadFromSudokuFile() {
+    struct savegame sudoku;
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Für Marvin:
+    // 1. Sudoku aus Datei einlesen
+    // 2. Sudoku parsen und in die sudoku Struktur bringen
+    // 3. Sudoku Struktur in die Savegamestruktur schreiben (oben in dieser Funktion definierte Variable) [sudokuGridSolved]
+    // 4. Sudoku Struktur an die Funktion makeSudokuPlayable weitergeben und dessen Rückgabewert ebenfalls in die Savegamestruktur schreiben [sudokuGrid]
+    // 5. pastTime in der Savegamestruktur auf 0 setzen
+    //
+    // Wichtig:
+    // Die Sudoku-Struktur mit dem fertig gelösten Sudoku muss erst mit checkSudoku() geprüft werden, sonst kann nicht gespielt werden!
+    // Eingaben von Zahlen werden als String eingelesen und an checkAndConvertInputToInt() weitergegeben!
+    // Falls nicht gespielt werden kann, kann mit return VIEW_HOME zum Startbildschirm zurückgekehrt werden!
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Eingelesenes Sudoku an den Play-View weitergeben und dessen Rückgabewert zurückgeben
+    return viewGamePlay(sudoku);
 }
 
 /**
