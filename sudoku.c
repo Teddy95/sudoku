@@ -30,9 +30,9 @@
 #define DIFFICULT 3
 
 // Parser Konstanten
-#define PARSER_VALID 0 //! Returned if parsing succeded
-#define PARSER_FILE_INACCESSIBLE 1 //! Returned if file is inaccessible
-#define PARSER_SUDOKU_NUMBERS_INVALID 2 //! Retuned if input was not completly numeric
+#define PARSER_VALID 0 //! Parsing erfolgreich
+#define PARSER_FILE_INACCESSIBLE 1 //! Datei nicht lesbar
+#define PARSER_SUDOKU_NUMBERS_INVALID 2 //! Sudoku enthielt falsch Eingaben.
 
 // Definition von Konstaten für die Views
 #define VIEW_HOME 0
@@ -75,33 +75,44 @@ struct time {
 };
 
 /**
- * Reads a file and interprets it as an sudoku
+ * Ließt, intepretiert und überprüft eine Datei in ein Sudoku
+ * Diese Funktion in den Views nutzen!
  *
- * @param filePath
+ * @param detaiPfad
  * @param errorCode
  *
- * @return The parsed sudoku
+ * @return Das geparste und überprüfte Sudoku
  */
 struct sudoku getSudokuFromFile(char[1024], int*);
 
 /**
- * Reads the file into a sudoku
+ * Ließt und parsed eine Datei in ein Sudoku.
  *
- * @param fileHandle
+ * @param dateiHandle
  * @param errorCode
  *
- * @return parsedSudoku
+ * @return geparstesSudoku
  */
 struct sudoku parseToSudoku(FILE*, int*);
 
 /**
- * Verifies if a path points to an existing file
+ * Verifizieret ob dateiPfad eine lesbare Datei identifiziert.
  *
- * @param filePath
+ * @param dateiPfad
  *
- * @return 1 if valid, 0 if not
+ * @return 1 wenn der Pfad
  */
 int verifyFilePath(char[1024]);
+
+/**
+ * Überprüft ob das Sudoku nur Zahlen von (einschließlich)
+ * 1 bis 9 enthält. Überprüft des Weiteren ob sudoku.generated nur 1 enthält.
+ *
+ * @param sudoku Sudoku to check
+ *
+ * @return Eine PARSER_* Konstante die den Fehlercode angibt.
+ */
+int checkSudoku(struct sudoku);
 
 // Funktionsprototypen (Funktionsbeschreibungen jeweils an den Funktionen)
 // Funktionen zum Initialisieren und Terminieren
@@ -230,6 +241,8 @@ struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
     struct sudoku sudoku;
     int i;
     for (i = 0; i < 9; i++) {
+        // Lese eine Zeile der Datei aus, und fülle die entsprechende Zeile
+        // im Sudoku
         fscanf(
             fileHandle,
             "%i,%i,%i,%i,%i,%i,%i,%i,%i",
@@ -245,18 +258,25 @@ struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
         );
     };
 
+    for (i = 0; i < 9; i++) {
+        for (j = 0; j < 9; j++) {
+            sudoku.generated[i][j] = 1;
+        }
+    }
+
     *error = checkSudoku(sudoku);
 
     return sudoku;
 }
 
 int checkSudoku(struct sudoku sudoku) {
-    int i, j, value = 0;
+    int i, j, value = 0, generated = 0;
     int isError = PARSER_VALID;
     for (i = 0; i < 9; i++) {
         for (j = 0; j < 9; j++) {
             value = sudoku.value[i][j];
-            if (value < 1 || value > 9) {
+            generated = sudoku.generated[i][j];
+            if (value < 1 || value > 9 || generated != 1) {
                 isError = PARSER_SUDOKU_NUMBERS_INVALID;
             }
         }
