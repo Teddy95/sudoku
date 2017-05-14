@@ -29,6 +29,11 @@
 #define MEDIUM 2
 #define DIFFICULT 3
 
+// Parser Konstanten
+#define PARSER_VALID 0 //! Returned if parsing succeded
+#define PARSER_FILE_INACCESSIBLE 1 //! Returned if file is inaccessible
+#define PARSER_SUDOKU_NUMBERS_INVALID 2 //! Retuned if input was not completly numeric
+
 // Definition von Konstaten für die Views
 #define VIEW_HOME 0
 #define VIEW_GAME_NEW 1
@@ -68,6 +73,35 @@ struct time {
     int minutes;
     int seconds;
 };
+
+/**
+ * Reads a file and interprets it as an sudoku
+ *
+ * @param filePath
+ * @param errorCode
+ *
+ * @return The parsed sudoku
+ */
+struct sudoku getSudokuFromFile(char[1024], int*);
+
+/**
+ * Reads the file into a sudoku
+ *
+ * @param fileHandle
+ * @param errorCode
+ *
+ * @return parsedSudoku
+ */
+struct sudoku parseToSudoku(FILE*, int*);
+
+/**
+ * Verifies if a path points to an existing file
+ *
+ * @param filePath
+ *
+ * @return 1 if valid, 0 if not
+ */
+int verifyFilePath(char[1024]);
 
 // Funktionsprototypen (Funktionsbeschreibungen jeweils an den Funktionen)
 // Funktionen zum Initialisieren und Terminieren
@@ -172,6 +206,80 @@ void die() {
     printf("Es ist ein unerwarteter Fehler aufgetreten! Bitte starten Sie das Programm neu!\n");
     exit(0);
 }
+
+/*************************************
+        START PARSING
+ *************************************/
+
+
+struct sudoku getSudokuFromFile(char path[1024], int *error) {
+    struct sudoku sudoku;
+    FILE *fileHandle;
+    if (verifyFilePath(path) == 1) {
+        *error = PARSER_VALID;
+        fileHandle = fopen(path, "r");
+        sudoku = parseToSudoku(fileHandle, error);
+    } else {
+        *error = PARSER_FILE_INACCESSIBLE;
+    }
+
+    return sudoku;
+}
+
+struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
+    struct sudoku sudoku;
+    int i;
+    for (i = 0; i < 9; i++) {
+        fscanf(
+            fileHandle,
+            "%i,%i,%i,%i,%i,%i,%i,%i,%i",
+            &sudoku.value[i][0],
+            &sudoku.value[i][1],
+            &sudoku.value[i][2],
+            &sudoku.value[i][3],
+            &sudoku.value[i][4],
+            &sudoku.value[i][5],
+            &sudoku.value[i][6],
+            &sudoku.value[i][7],
+            &sudoku.value[i][8]
+        );
+    };
+
+    *error = checkSudoku(sudoku);
+
+    return sudoku;
+}
+
+int checkSudoku(struct sudoku sudoku) {
+    int i, j, value = 0;
+    int isError = PARSER_VALID;
+    for (i = 0; i < 9; i++) {
+        for (j = 0; j < 9; j++) {
+            value = sudoku.value[i][j];
+            if (value < 1 || value > 9) {
+                isError = PARSER_SUDOKU_NUMBERS_INVALID;
+            }
+        }
+    }
+    return isError;
+}
+
+int verifyFilePath(char path[1024]) {
+    int success;
+    FILE *fileHandle;
+    fileHandle = fopen(path, "r");
+
+    if (fileHandle == NULL) {
+        success = 0;
+    } else {
+        success = 1;
+    }
+
+    return success;
+}
+/*************************************
+        ENDE PARSING
+ *************************************/
 
 /**
  * Funktion:        generateFullSudoku
@@ -834,7 +942,7 @@ struct savegame readSavegame(int slot, int *error) {
     // Datei-Handle definieren
     FILE *fileHandle;
     char fileName[12] = "slot0.skram\0";
-    
+
     *error = 0;
     fileName[4] = (slot - 1) + '0';
     i = 0;
