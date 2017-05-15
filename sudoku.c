@@ -112,7 +112,7 @@ int verifyFilePath(char[1024]);
  *
  * @return Eine PARSER_* Konstante die den Fehlercode angibt.
  */
-int checkSudoku(struct sudoku);
+int checkParsedSudoku(struct sudoku);
 
 // Funktionsprototypen (Funktionsbeschreibungen jeweils an den Funktionen)
 // Funktionen zum Initialisieren und Terminieren
@@ -264,12 +264,12 @@ struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
         }
     }
 
-    *error = checkSudoku(sudoku);
+    *error = checkParsedSudoku(sudoku);
 
     return sudoku;
 }
 
-int checkSudoku(struct sudoku sudoku) {
+int checkParsedSudoku(struct sudoku sudoku) {
     int i, j, value = 0, generated = 0;
     int isError = PARSER_VALID;
     for (i = 0; i < 9; i++) {
