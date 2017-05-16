@@ -298,20 +298,22 @@ int checkParsedSudoku(struct sudoku sudoku) {
 }
 
 void showParserErrorMessage(int errorCode) {
-    if (errorCode == PARSER_FILE_INACCESSIBLE) {
-        printf("Die angegebene Datei existiert nicht, oder auf sie kann nicht zugegriffen werden.\n");
-        printf("Bitte ueberpruefen sie ihre Eingabe und versuchen es erneut!\n\n");
-    }
+    switch (errorCode) {
+        case (PARSER_FILE_INACCESSIBLE):
+            printf("Die angegebene Datei existiert nicht, oder auf sie kann nicht zugegriffen werden.\n");
+            printf("Bitte ueberpruefen sie ihre Eingabe und versuchen es erneut!\n\n");
+            break;
 
-    if (errorCode == PARSER_SUDOKU_NUMBERS_INVALID) {
-        printf("Die Datei enthaelt ungueltigen Eingaben.");
-        printf("Sie sollte neun Reihen enthalten,\nwelche wie folgt aufgebaut sein sollten:\n");
-        printf("\"i,i,i,i,i,i,i,i,i\" (i steht fuer eine beliebige Zahl von 1-9)\n\n");
-    }
+        case (PARSER_SUDOKU_NUMBERS_INVALID):
+            printf("Die Datei enthaelt ungueltigen Eingaben.");
+            printf("Sie sollte neun Reihen enthalten,\nwelche wie folgt aufgebaut sein sollten:\n");
+            printf("\"i,i,i,i,i,i,i,i,i\" (i steht fuer eine beliebige Zahl von 1-9)\n\n");
+            break;
 
-    if (errorCode == PARSER_SUDOKU_INVALID) {
-        printf("Das Sudoku ist kein gueltiges Sudoku.\n");
-        printf("Die Zahlen in einer Reihe, Zeile und in einem 3x3 Quadrat muessen einmalig sein.\n\n");
+        case (PARSER_SUDOKU_INVALID): 
+            printf("Das Sudoku ist kein gueltiges Sudoku.\n");
+            printf("Die Zahlen in einer Reihe, Zeile und in einem 3x3 Quadrat muessen einmalig sein.\n\n");
+            break;
     }
     return;
 }
