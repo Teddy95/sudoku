@@ -33,6 +33,7 @@
 #define PARSER_VALID 0 //! Parsing erfolgreich
 #define PARSER_FILE_INACCESSIBLE 1 //! Datei nicht lesbar
 #define PARSER_SUDOKU_NUMBERS_INVALID 2 //! Sudoku enthielt falsch Eingaben.
+#define PARSER_SUDOKU_INVALID 3
 
 // Definition von Konstaten für die Views
 #define VIEW_HOME 0
@@ -45,7 +46,7 @@
 #define VIEW_GAME_READ 7
 
 // Definition von Konstante für maximale Zeichenkettenlänge
-#define STRLEN 255
+#define STRLEN 1024
 
 // Definition von Strukturen
 // Sudoku-Gitter
@@ -113,6 +114,13 @@ int verifyFilePath(char[1024]);
  * @return Eine PARSER_* Konstante die den Fehlercode angibt.
  */
 int checkParsedSudoku(struct sudoku);
+
+/**
+ * Zeigt eine Fehlernachricht entsprechend ihrer Bedeutung an.
+ *
+ * @param errorCode Fehlercode, zu welchem eine Nachricht darzustellen ist. 
+ */
+void showParserErrorMessage(int);
 
 // Funktionsprototypen (Funktionsbeschreibungen jeweils an den Funktionen)
 // Funktionen zum Initialisieren und Terminieren
@@ -188,6 +196,10 @@ int main() {
                 input = showView(VIEW_CREDITS);
                 break;
 
+            case VIEW_GAME_READ:
+                input = showView(VIEW_GAME_READ);
+                break;
+
             default:
                 die();
         }
@@ -216,6 +228,7 @@ void die() {
     system("cls");
     printf("Es ist ein unerwarteter Fehler aufgetreten! Bitte starten Sie das Programm neu!\n");
     exit(0);
+    return;
 }
 
 /*************************************
@@ -239,7 +252,7 @@ struct sudoku getSudokuFromFile(char path[1024], int *error) {
 
 struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
     struct sudoku sudoku;
-    int i;
+    int i,j;
     for (i = 0; i < 9; i++) {
         // Lese eine Zeile der Datei aus, und fülle die entsprechende Zeile
         // im Sudoku
@@ -282,6 +295,25 @@ int checkParsedSudoku(struct sudoku sudoku) {
         }
     }
     return isError;
+}
+
+void showParserErrorMessage(int errorCode) {
+    if (errorCode == PARSER_FILE_INACCESSIBLE) {
+        printf("Die angegebene Datei existiert nicht, oder auf sie kann nicht zugegriffen werden.\n");
+        printf("Bitte ueberpruefen sie ihre Eingabe und versuchen es erneut!\n\n");
+    }
+
+    if (errorCode == PARSER_SUDOKU_NUMBERS_INVALID) {
+        printf("Die Datei enthaelt ungueltigen Eingaben.");
+        printf("Sie sollte neun Reihen enthalten,\nwelche wie folgt aufgebaut sein sollten:\n");
+        printf("\"i,i,i,i,i,i,i,i,i\" (i steht fuer eine beliebige Zahl von 1-9)\n\n");
+    }
+
+    if (errorCode == PARSER_SUDOKU_INVALID) {
+        printf("Das Sudoku ist kein gueltiges Sudoku.\n");
+        printf("Die Zahlen in einer Reihe, Zeile und in einem 3x3 Quadrat muessen einmalig sein.\n\n");
+    }
+    return;
 }
 
 int verifyFilePath(char path[1024]) {
@@ -764,7 +796,7 @@ int charToInt(char charakter) {
  * Beschreibung:    Prüft und konvertiert eine eingegebene Zeichenkette.
  */
 int checkAndConvertInputToInt(char inputString[]) {
-    int i, strLen, charakter, result;
+    int i, strLen, result;
     result = 0;
     strLen = strlen(inputString);
 
@@ -792,7 +824,7 @@ int checkAndConvertInputToInt(char inputString[]) {
  * Beschreibung:    Prüft und konvertiert eine eingegebene Zeichenkette.
  */
 int checkAndConvertInputChar(char inputString[]) {
-    int i, strLen;
+    int strLen;
     strLen = strlen(inputString);
 
     // Zeichenkette darf nur ein Zeichen enthalten
@@ -1150,6 +1182,9 @@ int showView(int view) {
         case VIEW_CREDITS:
             return viewCredits();
 
+        case VIEW_GAME_READ:
+            return viewGameReadFromSudokuFile();
+
         default:
             return VIEW_EXIT;
     }
@@ -1175,7 +1210,8 @@ int viewHome() {
         printf("[1] Neues Spiel\n");
         printf("[2] Spiel laden\n");
         printf("[3] Credits\n");
-        printf("[4] Beenden\n");
+        printf("[4] Spiel einlesen\n");
+        printf("[5] Beenden\n");
         printf("\n");
 
         if (errorInput == 1) {
@@ -1212,6 +1248,7 @@ int viewHome() {
 
     // Darf nicht auftreten
     die();
+    return -1;
 }
 
 /**
@@ -1662,20 +1699,70 @@ int viewGameSave(struct savegame sudoku) {
  */
 int viewGameReadFromSudokuFile() {
     struct savegame sudoku;
+    struct sudoku parsedSudoku;
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Für Marvin:
-    // 1. Sudoku aus Datei einlesen
-    // 2. Sudoku parsen und in die sudoku Struktur bringen
-    // 3. Sudoku Struktur in die Savegamestruktur schreiben (oben in dieser Funktion definierte Variable) [sudokuGridSolved]
-    // 4. Sudoku Struktur an die Funktion makeSudokuPlayable weitergeben und dessen Rückgabewert ebenfalls in die Savegamestruktur schreiben [sudokuGrid]
-    // 5. pastTime in der Savegamestruktur auf 0 setzen
-    //
-    // Wichtig:
-    // Die Sudoku-Struktur mit dem fertig gelösten Sudoku muss erst mit checkSudoku() geprüft werden, sonst kann nicht gespielt werden!
-    // Eingaben von Zahlen werden als String eingelesen und an checkAndConvertInputToInt() weitergegeben!
-    // Falls nicht gespielt werden kann, kann mit return VIEW_HOME zum Startbildschirm zurückgekehrt werden!
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int input = 0, errorInput = 0, difficulty = 0, difficultyInput = 0;
+    char inputString[STRLEN], difficultyInputString[STRLEN];
+    errorInput = -1;
+
+    // Wiederholt die Anzeige des Startbilschirms so oft, bis eine gültige Eingabe erfolgt ist
+    do {
+        system("cls");
+        printf("SKRAM Sudoku\n");
+        printf("\n");
+        printf("Sudoku aus Datei laden\n");
+        printf("\n");
+        printf("Geben Sie bitte den Pfad zur einzulesenden Datei ein.\nGeben Sie eine 1 ein, wenn Sie zurueck zum Hauptmenue navigieren moechten.\n");
+        printf("\n");
+
+
+        showParserErrorMessage(errorInput);
+
+        printf("Eingabe: ");
+        readLine(inputString);
+        input = checkAndConvertInputToInt(inputString);
+
+        parsedSudoku = getSudokuFromFile(inputString, &errorInput);
+
+
+        do {
+            if (input == 1 || errorInput != PARSER_VALID) {
+                break;
+            }
+            printf("\nBitte geben Sie einen Schwierigkeits an.\n");
+            printf("[1] Leicht\n");
+            printf("[2] Mittel\n");
+            printf("[3] Schwer\n");
+            readLine(difficultyInputString);
+            difficultyInput = checkAndConvertInputToInt(difficultyInputString);
+
+            switch(difficultyInput) {
+                case 1:
+                    difficulty = EASY;
+                    break;
+                case 2:
+                    difficulty = MEDIUM;
+                    break;
+                case 3:
+                    difficulty = DIFFICULT;
+                    break;
+            }
+        } while (difficulty != EASY
+                 && difficulty != MEDIUM
+                 && difficulty != DIFFICULT);
+
+        if (input == 1) {
+            return VIEW_HOME;
+        }
+
+        if (checkSudoku(parsedSudoku)) {
+            sudoku.sudokuGridSolved = parsedSudoku;
+            sudoku.sudokuGrid = makeSodukoPlayable(parsedSudoku, difficulty);
+        } else {
+            errorInput = PARSER_SUDOKU_INVALID;
+        }
+
+    } while (input != 1 && errorInput != PARSER_VALID);
 
     // Eingelesenes Sudoku an den Play-View weitergeben und dessen Rückgabewert zurückgeben
     return viewGamePlay(sudoku);
