@@ -6,3 +6,77 @@
 	<windows.h>
 	<math.h>
 
+1495379970 source:e:\downloads\sudoku-master\sudoku-master\sudoku.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<windows.h>
+	<math.h>
+	"header/displayTime.h"
+	"header/savegame.h"
+	"header/sudoku.h"
+
+1495377553 source:e:\downloads\sudoku-master\sudoku-master\src\test.c
+
+1495381378 e:\downloads\sudoku-master\sudoku-master\header\displaytime.h
+	<math.h>
+
+1495381384 source:e:\downloads\sudoku-master\sudoku-master\src\displaytime.c
+	"../header/displayTime.h"
+
+1495380133 source:e:\downloads\sudoku-master\sudoku-master\src\savegame.c
+	"../header/savegame.h"
+
+1495384384 source:e:\downloads\sudoku-master\sudoku-master\src\sudoku.c
+	"../header/sudoku.h"
+
+1495384256 e:\downloads\sudoku-master\sudoku-master\header\savegame.h
+	"../header/sudoku.h"
+
+1495384668 e:\downloads\sudoku-master\sudoku-master\header\sudoku.h
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<windows.h>
+	<math.h>
+	"../header/displayTime.h"
+	"../header/views.h"
+
+1495381397 e:\downloads\sudoku-master\sudoku-master\header
+
+1495384452 e:\downloads\sudoku-master\sudoku-master\header\views.h
+	"../header/sudoku.h"
+
+1495380795 source:e:\downloads\sudoku-master\sudoku-master\src\views.c
+	"../header/views.h"
+
+1495382430 source:e:\downloads\sudoku-master\sudoku-master\main.c
+	"header/sudoku.h"
+
+1495382430 source:e:\programming\school\sudoku\main.c
+	"header/sudoku.h"
+
+1495384668 e:\programming\school\sudoku\header\sudoku.h
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<windows.h>
+	<math.h>
+	"../header/displayTime.h"
+	"../header/views.h"
+
+1495381378 e:\programming\school\sudoku\header\displaytime.h
+	<math.h>
+
+1495384452 e:\programming\school\sudoku\header\views.h
+	"../header/sudoku.h"
+
+1495381384 source:e:\programming\school\sudoku\src\displaytime.c
+	"../header/displayTime.h"
+
+1495384384 source:e:\programming\school\sudoku\src\sudoku.c
+	"../header/sudoku.h"
+
+1495391450 source:e:\programming\school\sudoku\src\views.c
+	"../header/views.h"
+
