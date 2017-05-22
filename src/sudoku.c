@@ -5,9 +5,9 @@
  *
  * Parameter:       slot (int) -> Speicherstand
  *
- * Rückgabewert:    Gibt eine 0 zurück, wenn der Spielstand nicht existiert, andernfalls wird eine 1 zurückgegeben
+ * RÃ¼ckgabewert:    Gibt eine 0 zurÃ¼ck, wenn der Spielstand nicht existiert, andernfalls wird eine 1 zurÃ¼ckgegeben
  *
- * Beschreibung:    Prüft ob Spielstand existiert.
+ * Beschreibung:    PrÃ¼ft ob Spielstand existiert.
  */
 int checkSavegameSlot(int slot) {
     // Datei-Handle definieren
@@ -16,7 +16,7 @@ int checkSavegameSlot(int slot) {
 
     fileName[4] = (slot - 1) + '0';
 
-    // Prüfen ob Datei existiert
+    // PrÃ¼fen ob Datei existiert
     fileHandle = fopen(fileName, "r");
 
     if (fileHandle == NULL) {
@@ -32,11 +32,11 @@ int checkSavegameSlot(int slot) {
  * Funktion:        readSavegame
  *
  * Parameter:       slot (int)   -> Speicherstand
- * Parameter:       *error (int) -> Enthält nach dem Funktionsaufruf: 1 = Spielstand existiert nicht, 2 = Datei ist beschädigt oder enthält falschen Inhalt
+ * Parameter:       *error (int) -> EnthÃ¤lt nach dem Funktionsaufruf: 1 = Spielstand existiert nicht, 2 = Datei ist beschÃ¤digt oder enthÃ¤lt falschen Inhalt
  *
- * Rückgabewert:    Gibt die Struktur 'savegame' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'savegame' zurÃ¼ck
  *
- * Beschreibung:    Liest ein gespeichertes Spiel aus einer Datei (Slot) und gibt es als Struktur 'savegame' zurück.
+ * Beschreibung:    Liest ein gespeichertes Spiel aus einer Datei (Slot) und gibt es als Struktur 'savegame' zurÃ¼ck.
  */
 struct savegame readSavegame(int slot, int *error) {
     struct savegame sudoku;
@@ -82,13 +82,13 @@ struct savegame readSavegame(int slot, int *error) {
 
             n++;
 
-            // Sobald 4 Ziffern ausgelesen wurden wird in die nächste Spalte gewechselt
+            // Sobald 4 Ziffern ausgelesen wurden wird in die nÃ¤chste Spalte gewechselt
             if (n > 3) {
                 n = 0;
                 j++;
             }
 
-            // Sobald 9 Spalten ausgelesen wurden, wird in die nächste Zeile gewechselt
+            // Sobald 9 Spalten ausgelesen wurden, wird in die nÃ¤chste Zeile gewechselt
             if (j == 9) {
                 j = 0;
                 i++;
@@ -96,7 +96,7 @@ struct savegame readSavegame(int slot, int *error) {
         }
     }
 
-    // Dateizeiger auf Dateianfang zurücksetzen
+    // Dateizeiger auf Dateianfang zurÃ¼cksetzen
     fseek(fileHandle, 0, SEEK_SET);
 
     // Datei erneut bis Zeilenumbruch durchlaufen
@@ -125,10 +125,10 @@ struct savegame readSavegame(int slot, int *error) {
 /**
  * Funktion:        writeSavegame
  *
- * Parameter:       sudoku (struct savegame) -> Savegame-Struktur, in dem der aktuelle Spielfortschritt, die Lösung und die bislang benötigte Zeit enthalten ist
+ * Parameter:       sudoku (struct savegame) -> Savegame-Struktur, in dem der aktuelle Spielfortschritt, die LÃ¶sung und die bislang benÃ¶tigte Zeit enthalten ist
  * Parameter:       slot (int)               -> Speicherstand
  *
- * Rückgabewert:    Gibt eine 0 für falsch und eine 1 für korrekt zurück
+ * RÃ¼ckgabewert:    Gibt eine 0 fÃ¼r falsch und eine 1 fÃ¼r korrekt zurÃ¼ck
  *
  * Beschreibung:    Speichert den aktuellen Spielfortschritt in einer Datei (Slot).
  */
@@ -169,7 +169,7 @@ int writeSavegame(struct savegame sudoku, int slot) {
  *
  * Parameter:       slot (int) -> Speicherstand
  *
- * Beschreibung:    Löscht einen Speicherstand (Slot) -> Löscht die Datei.
+ * Beschreibung:    LÃ¶scht einen Speicherstand (Slot) -> LÃ¶scht die Datei.
  */
 void deleteSavegame(int slot) {
 	char fileName[12] = "slot0.skram\0";
@@ -206,116 +206,12 @@ void die() {
     return;
 }
 
-/*************************************
-        START PARSING
- *************************************/
-
-
-struct sudoku getSudokuFromFile(char path[1024], int *error) {
-    struct sudoku sudoku;
-    FILE *fileHandle;
-    if (verifyFilePath(path) == 1) {
-        *error = PARSER_VALID;
-        fileHandle = fopen(path, "r");
-        sudoku = parseToSudoku(fileHandle, error);
-    } else {
-        *error = PARSER_FILE_INACCESSIBLE;
-    }
-
-    return sudoku;
-}
-
-struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
-    struct sudoku sudoku;
-    int i,j;
-    for (i = 0; i < 9; i++) {
-        // Lese eine Zeile der Datei aus, und fülle die entsprechende Zeile
-        // im Sudoku
-        fscanf(
-            fileHandle,
-            "%i,%i,%i,%i,%i,%i,%i,%i,%i",
-            &sudoku.value[i][0],
-            &sudoku.value[i][1],
-            &sudoku.value[i][2],
-            &sudoku.value[i][3],
-            &sudoku.value[i][4],
-            &sudoku.value[i][5],
-            &sudoku.value[i][6],
-            &sudoku.value[i][7],
-            &sudoku.value[i][8]
-        );
-    };
-
-    for (i = 0; i < 9; i++) {
-        for (j = 0; j < 9; j++) {
-            sudoku.generated[i][j] = 1;
-        }
-    }
-
-    *error = checkParsedSudoku(sudoku);
-
-    return sudoku;
-}
-
-int checkParsedSudoku(struct sudoku sudoku) {
-    int i, j, value = 0, generated = 0;
-    int isError = PARSER_VALID;
-    for (i = 0; i < 9; i++) {
-        for (j = 0; j < 9; j++) {
-            value = sudoku.value[i][j];
-            generated = sudoku.generated[i][j];
-            if (value < 1 || value > 9 || generated != 1) {
-                isError = PARSER_SUDOKU_NUMBERS_INVALID;
-            }
-        }
-    }
-    return isError;
-}
-
-void showParserErrorMessage(int errorCode) {
-    switch (errorCode) {
-        case (PARSER_FILE_INACCESSIBLE):
-            printf("Die angegebene Datei existiert nicht, oder auf sie kann nicht zugegriffen werden.\n");
-            printf("Bitte ueberpruefen sie ihre Eingabe und versuchen es erneut!\n\n");
-            break;
-
-        case (PARSER_SUDOKU_NUMBERS_INVALID):
-            printf("Die Datei enthaelt ungueltigen Eingaben.");
-            printf("Sie sollte neun Reihen enthalten,\nwelche wie folgt aufgebaut sein sollten:\n");
-            printf("\"i,i,i,i,i,i,i,i,i\" (i steht fuer eine beliebige Zahl von 1-9)\n\n");
-            break;
-
-        case (PARSER_SUDOKU_INVALID):
-            printf("Das Sudoku ist kein gueltiges Sudoku.\n");
-            printf("Die Zahlen in einer Reihe, Zeile und in einem 3x3 Quadrat muessen einmalig sein.\n\n");
-            break;
-    }
-    return;
-}
-
-int verifyFilePath(char path[1024]) {
-    int success;
-    FILE *fileHandle;
-    fileHandle = fopen(path, "r");
-
-    if (fileHandle == NULL) {
-        success = 0;
-    } else {
-        success = 1;
-    }
-
-    return success;
-}
-/*************************************
-        ENDE PARSING
- *************************************/
-
 /**
  * Funktion:        generateFullSudoku
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
- * Beschreibung:    Generiert ein vollständiges Sudoku in einem zeidimensionalem numerischem Array innerhalb der Struktur 'sudoku'.
+ * Beschreibung:    Generiert ein vollstÃ¤ndiges Sudoku in einem zeidimensionalem numerischem Array innerhalb der Struktur 'sudoku'.
  */
 struct sudoku generateFullSudoku() {
     int i, j, k;
@@ -372,17 +268,17 @@ struct sudoku generateFullSudoku() {
 /**
  * Funktion:        makeSodukoPlayable
  *
- * Parameter:       sudokuGrid (struct sudoku) -> Nimmt den Rückgabewert von Funktion 'generateFullSudoku' entgegen
+ * Parameter:       sudokuGrid (struct sudoku) -> Nimmt den RÃ¼ckgabewert von Funktion 'generateFullSudoku' entgegen
  * Parameter:       difficulty (int)           -> Gibt einen Schwierigkeitsgrad an (1 = leicht, 2 = mittel und 3 = schwer)
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
- * Beschreibung:    Erstellt aus dem vollständigen Sudoku eine spielbare Variante mit leeren Feldern.
+ * Beschreibung:    Erstellt aus dem vollstÃ¤ndigen Sudoku eine spielbare Variante mit leeren Feldern.
  */
 struct sudoku makeSodukoPlayable(struct sudoku sudokuGrid, int difficulty) {
     int emptyFields, i, row, column;
 
-    // Leere Felder (Felder zum ausfüllen) nach angegebenen Schwierigkeitsgrad festlegen
+    // Leere Felder (Felder zum ausfÃ¼llen) nach angegebenen Schwierigkeitsgrad festlegen
     switch (difficulty) {
         case 1:
             emptyFields = 25;
@@ -398,7 +294,7 @@ struct sudoku makeSodukoPlayable(struct sudoku sudokuGrid, int difficulty) {
             break;
     }
 
-    // Per Zufall ausgewählte Felder im Sudoku-Muster durch 0 ersetzen (0 = leer)
+    // Per Zufall ausgewÃ¤hlte Felder im Sudoku-Muster durch 0 ersetzen (0 = leer)
     for (i = emptyFields; i > 0; i--) {
         do {
             row = rand() % SIZE;
@@ -437,15 +333,15 @@ void shiftRight(int array[], int size, int steps) {
 /**
  * Funktion:        shuffle
  *
- * Parameter:       array (int[]) -> Array, in welchem die Werte zufällig gemischt werden
+ * Parameter:       array (int[]) -> Array, in welchem die Werte zufÃ¤llig gemischt werden
  * Parameter:       size (int)    -> Anzahl der Elemente im Array
  *
- * Beschreibung:    Mischt zufällig die Werte in einem Array.
+ * Beschreibung:    Mischt zufÃ¤llig die Werte in einem Array.
  */
 void shuffle(int array[], int size) {
     int i, x, y;
 
-    // Zwei per Zufall ausgewählte Werte im Array austauschen
+    // Zwei per Zufall ausgewÃ¤hlte Werte im Array austauschen
     for (i = 0; i < size; i++) {
         x = rand() % size;
         y = rand() % size;
@@ -464,14 +360,14 @@ void shuffle(int array[], int size) {
  * Parameter:       x (int)                    -> Zeile 1 (0, 1 oder 2)
  * Parameter:       y (int)                    -> Zeile 2 (0, 1 oder 2)
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
  * Beschreibung:    Mischt Zeilen im Sudoku durcheinander.
  */
 struct sudoku shuffleRows(struct sudoku sudokuGrid) {
     int quadrant, x, y, i;
 
-    // Dreiergruppe und Zeilen darin per Zufall auswählen
+    // Dreiergruppe und Zeilen darin per Zufall auswÃ¤hlen
     for (i = 0; i < SIZE; i++) {
         quadrant = rand() % SIZE / 3;
         x = rand() % SIZE / 3;
@@ -492,14 +388,14 @@ struct sudoku shuffleRows(struct sudoku sudokuGrid) {
  * Parameter:       x (int)                    -> Zeile 1 (0, 1 oder 2)
  * Parameter:       y (int)                    -> Zeile 2 (0, 1 oder 2)
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
  * Beschreibung:    Mischt Spalten im Sudoku durcheinander.
  */
 struct sudoku shuffleColumns(struct sudoku sudokuGrid) {
     int quadrant, x, y, i;
 
-    // Dreiergruppe und Spalten darin per Zufall auswählen
+    // Dreiergruppe und Spalten darin per Zufall auswÃ¤hlen
     for (i = 0; i < SIZE; i++) {
         quadrant = rand() % SIZE / 3;
         x = rand() % SIZE / 3;
@@ -536,7 +432,7 @@ void swap(int *x, int *y) {
  * Parameter:       x (int)                    -> Zeile 1 (0, 1 oder 2)
  * Parameter:       y (int)                    -> Zeile 2 (0, 1 oder 2)
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
  * Beschreibung:    Tauscht zwei Zeilen im Sudoku miteinander aus.
  */
@@ -545,7 +441,7 @@ struct sudoku swapRows(struct sudoku sudokuGrid, int quadrant, int x, int y) {
     int indexX;
     int indexY;
 
-    // Prüfen ob übergebene Parameter legal sind
+    // PrÃ¼fen ob Ã¼bergebene Parameter legal sind
     if ((quadrant == 0 || quadrant == 1 || quadrant == 2) && (x == 0 || x == 1 || x == 2) && (y == 0 || y == 1 || y == 2)) {
         // Zeilen in Dreiergruppe errechnen
         indexX = (9 / 3 * quadrant) + x;
@@ -568,7 +464,7 @@ struct sudoku swapRows(struct sudoku sudokuGrid, int quadrant, int x, int y) {
  * Parameter:       x (int)                    -> Spalte 1 (0, 1 oder 2)
  * Parameter:       y (int)                    -> Spalte 2 (0, 1 oder 2)
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
  * Beschreibung:    Tauscht zwei Spalten im Sudoku miteinander aus.
  */
@@ -577,7 +473,7 @@ struct sudoku swapColumns(struct sudoku sudokuGrid, int quadrant, int x, int y) 
     int indexX;
     int indexY;
 
-    // Prüfen ob übergebene Parameter legal sind
+    // PrÃ¼fen ob Ã¼bergebene Parameter legal sind
     if ((quadrant == 0 || quadrant == 1 || quadrant == 2) && (x == 0 || x == 1 || x == 2) && (y == 0 || y == 1 || y == 2)) {
         // Spalten in Dreiergruppe errechnen
         indexX = (9 / 3 * quadrant) + x;
@@ -595,22 +491,22 @@ struct sudoku swapColumns(struct sudoku sudokuGrid, int quadrant, int x, int y) 
 /**
  * Funktion:        checkSudoku
  *
- * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, welches überprüft werden soll
+ * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, welches Ã¼berprÃ¼ft werden soll
  *
- * Rückgabewert:    Gibt eine 0 für falsch zurück und eine 1 für korrekt
+ * RÃ¼ckgabewert:    Gibt eine 0 fÃ¼r falsch zurÃ¼ck und eine 1 fÃ¼r korrekt
  *
- * Beschreibung:    Prüft ob das Sudoku richtig und vollsträndig gelöst wurde.
+ * Beschreibung:    PrÃ¼ft ob das Sudoku richtig und vollstrÃ¤ndig gelÃ¶st wurde.
  */
 int checkSudoku(struct sudoku sudokuGrid) {
     int i, j;
     struct field field;
 
-    // Wenn es noch leere Felder gibt, kann das Sudoku noch nicht gelöst sein
+    // Wenn es noch leere Felder gibt, kann das Sudoku noch nicht gelÃ¶st sein
     if (countEmptyFields(sudokuGrid) > 0) {
         return 0;
     }
 
-    // Jedes Feld einzeln prüfen
+    // Jedes Feld einzeln prÃ¼fen
     for (i = 0; i < SIZE; i++) {
         field.row = i;
 
@@ -630,14 +526,14 @@ int checkSudoku(struct sudoku sudokuGrid) {
  * Funktion:        checkValue
  *
  * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen
- * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches überprüft werden soll
+ * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches Ã¼berprÃ¼ft werden soll
  *
- * Rückgabewert:    Gibt eine 0 für falsch zurück und eine 1 für korrekt (1 wird auch zurückgegeben, wenn der Wert aktuell korrekt ist, in der Gesamtlösung jedoch nicht)
+ * RÃ¼ckgabewert:    Gibt eine 0 fÃ¼r falsch zurÃ¼ck und eine 1 fÃ¼r korrekt (1 wird auch zurÃ¼ckgegeben, wenn der Wert aktuell korrekt ist, in der GesamtlÃ¶sung jedoch nicht)
  *
- * Beschreibung:    Prüft ob ein Wert im Sudoku richtig gesetzt wurde.
+ * Beschreibung:    PrÃ¼ft ob ein Wert im Sudoku richtig gesetzt wurde.
  */
 int checkValue(struct sudoku sudokuGrid, struct field field) {
-    // Feld in Zeile, Reihe und Gruppe (3x3) auf Einmaligkeit prüfen
+    // Feld in Zeile, Reihe und Gruppe (3x3) auf Einmaligkeit prÃ¼fen
     if (checkRow(sudokuGrid, field) && checkColumn(sudokuGrid, field) && checkGroup(sudokuGrid, field)) {
         return 1;
     }
@@ -649,17 +545,17 @@ int checkValue(struct sudoku sudokuGrid, struct field field) {
  * Funktion:        checkRow
  *
  * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen
- * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches überprüft werden soll
+ * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches Ã¼berprÃ¼ft werden soll
  *
- * Rückgabewert:    Gibt eine 0 für falsch zurück und eine 1 für korrekt (1 wird auch zurückgegeben, wenn der Wert aktuell korrekt ist, in der Gesamtlösung jedoch nicht)
+ * RÃ¼ckgabewert:    Gibt eine 0 fÃ¼r falsch zurÃ¼ck und eine 1 fÃ¼r korrekt (1 wird auch zurÃ¼ckgegeben, wenn der Wert aktuell korrekt ist, in der GesamtlÃ¶sung jedoch nicht)
  *
- * Beschreibung:    Prüft ob ein Wert in einer Zeile richtig gesetzt wurde.
+ * Beschreibung:    PrÃ¼ft ob ein Wert in einer Zeile richtig gesetzt wurde.
  */
 int checkRow(struct sudoku sudokuGrid, struct field field) {
     int i, counter;
     counter = 0;
 
-    // Feld in Zeile auf Einmaligkeit prüfen
+    // Feld in Zeile auf Einmaligkeit prÃ¼fen
     for (i = 0; i < SIZE; i++) {
         if (sudokuGrid.value[field.row][i] == sudokuGrid.value[field.row][field.column]) {
             counter++;
@@ -678,17 +574,17 @@ int checkRow(struct sudoku sudokuGrid, struct field field) {
  * Funktion:        checkColumn
  *
  * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen
- * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches überprüft werden soll
+ * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches Ã¼berprÃ¼ft werden soll
  *
- * Rückgabewert:    Gibt eine 0 für falsch zurück und eine 1 für korrekt (1 wird auch zurückgegeben, wenn der Wert aktuell korrekt ist, in der Gesamtlösung jedoch nicht)
+ * RÃ¼ckgabewert:    Gibt eine 0 fÃ¼r falsch zurÃ¼ck und eine 1 fÃ¼r korrekt (1 wird auch zurÃ¼ckgegeben, wenn der Wert aktuell korrekt ist, in der GesamtlÃ¶sung jedoch nicht)
  *
- * Beschreibung:    Prüft ob ein Wert in einer Spalte richtig gesetzt wurde.
+ * Beschreibung:    PrÃ¼ft ob ein Wert in einer Spalte richtig gesetzt wurde.
  */
 int checkColumn(struct sudoku sudokuGrid, struct field field) {
     int i, counter;
     counter = 0;
 
-    // Feld in Spalte auf Einmaligkeit prüfen
+    // Feld in Spalte auf Einmaligkeit prÃ¼fen
     for (i = 0; i < SIZE; i++) {
         if (sudokuGrid.value[i][field.column] == sudokuGrid.value[field.row][field.column]) {
             counter++;
@@ -707,11 +603,11 @@ int checkColumn(struct sudoku sudokuGrid, struct field field) {
  * Funktion:        checkGroup
  *
  * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen
- * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches überprüft werden soll
+ * Parameter:       field (struct field)       -> Koordinaten vom Feld, welches Ã¼berprÃ¼ft werden soll
  *
- * Rückgabewert:    Gibt eine 0 für falsch zurück und eine 1 für korrekt (1 wird auch zurückgegeben, wenn der Wert aktuell korrekt ist, in der Gesamtlösung jedoch nicht)
+ * RÃ¼ckgabewert:    Gibt eine 0 fÃ¼r falsch zurÃ¼ck und eine 1 fÃ¼r korrekt (1 wird auch zurÃ¼ckgegeben, wenn der Wert aktuell korrekt ist, in der GesamtlÃ¶sung jedoch nicht)
  *
- * Beschreibung:    Prüft ob ein Wert in einem 9x9 Block richtig gesetzt wurde.
+ * Beschreibung:    PrÃ¼ft ob ein Wert in einem 9x9 Block richtig gesetzt wurde.
  */
 int checkGroup(struct sudoku sudokuGrid, struct field field) {
     int row, column, i, j, counter;
@@ -721,7 +617,7 @@ int checkGroup(struct sudoku sudokuGrid, struct field field) {
     row = (field.row - (field.row % 3)) / 3;
     column = (field.column - (field.column % 3)) / 3;
 
-    // Feld in Gruppe (3x3) auf Einmaligkeit prüfen
+    // Feld in Gruppe (3x3) auf Einmaligkeit prÃ¼fen
     for (i = 0; i < SIZE / 3; i++) {
         for (j = 0; j < SIZE / 3; j++) {
             if (sudokuGrid.value[row * 3 + i][column * 3 + j] == sudokuGrid.value[field.row][field.column]) {
@@ -743,15 +639,15 @@ int checkGroup(struct sudoku sudokuGrid, struct field field) {
  *
  * Parameter:       charakter (struct sudoku) -> Buchstabe
  *
- * Rückgabewert:    Gibt einen Wert zurück, welcher als 'column'-Wert in der Struktur 'field' verwendet werden kann. Gibt im Fehlerfall -1 zurück
+ * RÃ¼ckgabewert:    Gibt einen Wert zurÃ¼ck, welcher als 'column'-Wert in der Struktur 'field' verwendet werden kann. Gibt im Fehlerfall -1 zurÃ¼ck
  *
- * Beschreibung:    Prüft ob ein Wert im Sudoku richtig gesetzt wurde.
+ * Beschreibung:    PrÃ¼ft ob ein Wert im Sudoku richtig gesetzt wurde.
  */
 int charToInt(char charakter) {
     int result = 0;
 
     if (charakter >= 65 && charakter <= 73) {
-        // Großbuchstabe A - I -> ASCII Code von A subtrahieren
+        // GroÃŸbuchstabe A - I -> ASCII Code von A subtrahieren
         result = charakter - 65;
     } else if (charakter >= 97 && charakter <= 105) {
         // Kleinbuchstabe a - i -> ASCII Code von a subtrahieren
@@ -768,9 +664,9 @@ int charToInt(char charakter) {
  *
  * Parameter:       inputString (char[]) -> Eingegebene Zeichenkette
  *
- * Rückgabewert:    Gibt einen für die View-Steuerung nötigen Int-Wert zurück
+ * RÃ¼ckgabewert:    Gibt einen fÃ¼r die View-Steuerung nÃ¶tigen Int-Wert zurÃ¼ck
  *
- * Beschreibung:    Prüft und konvertiert eine eingegebene Zeichenkette.
+ * Beschreibung:    PrÃ¼ft und konvertiert eine eingegebene Zeichenkette.
  */
 int checkAndConvertInputToInt(char inputString[]) {
     int i, strLen, result;
@@ -796,9 +692,9 @@ int checkAndConvertInputToInt(char inputString[]) {
  *
  * Parameter:       inputString (char[]) -> Eingegebene Zeichenkette
  *
- * Rückgabewert:    Gibt einen Wert zurück, welcher als 'column'-Wert in der Struktur 'field' verwendet werden kann. Gibt im Fehlerfall -1 zurück
+ * RÃ¼ckgabewert:    Gibt einen Wert zurÃ¼ck, welcher als 'column'-Wert in der Struktur 'field' verwendet werden kann. Gibt im Fehlerfall -1 zurÃ¼ck
  *
- * Beschreibung:    Prüft und konvertiert eine eingegebene Zeichenkette.
+ * Beschreibung:    PrÃ¼ft und konvertiert eine eingegebene Zeichenkette.
  */
 int checkAndConvertInputChar(char inputString[]) {
     int strLen;
@@ -837,22 +733,22 @@ void readLine(char inputString[]) {
  * Funktion:        alterValue
  *
  * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen
- * Parameter:       field (struct field)       -> Koordinaten vom Feld, in welchem der Wert geändert werden soll
- * Parameter:       newValue (int)             -> Neuer Wert für das Feld
- * Parameter:       *error (int)               -> Enthält nach dem Funktionsaufruf: 1 = Feld kann nicht geändert werden, 2 = Neuer Wert ist kleiner als 1, 3 = Neuer Wert ist größer als 9
+ * Parameter:       field (struct field)       -> Koordinaten vom Feld, in welchem der Wert geÃ¤ndert werden soll
+ * Parameter:       newValue (int)             -> Neuer Wert fÃ¼r das Feld
+ * Parameter:       *error (int)               -> EnthÃ¤lt nach dem Funktionsaufruf: 1 = Feld kann nicht geÃ¤ndert werden, 2 = Neuer Wert ist kleiner als 1, 3 = Neuer Wert ist grÃ¶ÃŸer als 9
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
- * Beschreibung:    Schreibt einen neuen Wert in ein ausgewähltes Feld im Sudoku-Muster.
+ * Beschreibung:    Schreibt einen neuen Wert in ein ausgewÃ¤hltes Feld im Sudoku-Muster.
  */
 struct sudoku alterValue(struct sudoku sudokuGrid, struct field field, int newValue, int *error) {
-    // Vordefinierte Felder dürfen nicht geändert werden
+    // Vordefinierte Felder dÃ¼rfen nicht geÃ¤ndert werden
     if (sudokuGrid.generated[field.row][field.column] == 1) {
         *error = 1;
         return sudokuGrid;
     }
 
-    // Wenn der Wert im Zahlenbereich der natürlichen Zahlen von 1 bis 9 liegt, Wert im Feld ändern
+    // Wenn der Wert im Zahlenbereich der natÃ¼rlichen Zahlen von 1 bis 9 liegt, Wert im Feld Ã¤ndern
     if (newValue < 0) {
         *error = 2;
         return sudokuGrid;
@@ -870,12 +766,12 @@ struct sudoku alterValue(struct sudoku sudokuGrid, struct field field, int newVa
 /**
  * Funktion:        fillRandomField
  *
- * Parameter:       sudokuGridSolved (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen (fertig gelöst)
+ * Parameter:       sudokuGridSolved (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen (fertig gelÃ¶st)
  * Parameter:       sudokuGrid (struct sudoku)       -> Sudoku-Muster, in dem die Werte stehen
  *
- * Rückgabewert:    Gibt die Struktur 'sudoku' zurück
+ * RÃ¼ckgabewert:    Gibt die Struktur 'sudoku' zurÃ¼ck
  *
- * Beschreibung:    Schreibt einen neuen Wert in ein zufälliges Feld im Sudoku-Muster.
+ * Beschreibung:    Schreibt einen neuen Wert in ein zufÃ¤lliges Feld im Sudoku-Muster.
  */
 struct sudoku fillRandomField(struct sudoku sudokuGridSolved, struct sudoku sudokuGrid) {
     struct field field;
@@ -885,15 +781,15 @@ struct sudoku fillRandomField(struct sudoku sudokuGridSolved, struct sudoku sudo
     error = 1;
     sudoku = sudokuGrid;
 
-    // Es kann nur ein Feld geüllt werden, wenn es noch leere Felder gibt
+    // Es kann nur ein Feld geÃ¼llt werden, wenn es noch leere Felder gibt
     if (countEmptyFields(sudokuGrid) > 0) {
         do {
-            // Feld so lange zufällig wählen, bis alterValue() beim Ändern keinen Fehler zurückgibt
+            // Feld so lange zufÃ¤llig wÃ¤hlen, bis alterValue() beim Ã„ndern keinen Fehler zurÃ¼ckgibt
             field.row = rand() % 9;
             field.column = rand() % 9;
 
             if (sudokuGrid.value[field.row][field.column] == 0) {
-                // Feld aus dem Sudoku mit dem selben Feld aus der Lösung ersetzen
+                // Feld aus dem Sudoku mit dem selben Feld aus der LÃ¶sung ersetzen
                 sudoku = alterValue(sudoku, field, sudokuGridSolved.value[field.row][field.column], &error);
             }
         } while (error != 0);
@@ -907,15 +803,15 @@ struct sudoku fillRandomField(struct sudoku sudokuGridSolved, struct sudoku sudo
  *
  * Parameter:       sudokuGrid (struct sudoku) -> Sudoku-Muster, in dem die Werte stehen
  *
- * Rückgabewert:    Gibt die Anzahl der leeren Felder in einem Sudoku zurück
+ * RÃ¼ckgabewert:    Gibt die Anzahl der leeren Felder in einem Sudoku zurÃ¼ck
  *
- * Beschreibung:    Zählt leere Felder in einem Sudoku Muster.
+ * Beschreibung:    ZÃ¤hlt leere Felder in einem Sudoku Muster.
  */
 int countEmptyFields(struct sudoku sudokuGrid) {
     int i, j, counter;
     counter = 0;
 
-    // Leere Felder zählen
+    // Leere Felder zÃ¤hlen
     for (i = 0; i < SIZE; i++) {
         for (j = 0; j < SIZE; j++) {
             if (sudokuGrid.value[i][j] == 0) {
@@ -925,4 +821,137 @@ int countEmptyFields(struct sudoku sudokuGrid) {
     }
 
     return counter;
+}
+
+/**
+ * LieÃŸt, intepretiert und Ã¼berprÃ¼ft eine Datei in ein Sudoku
+ * Diese Funktion in den Views nutzen!
+ *
+ * @param dateiPfad
+ * @param errorCode
+ *
+ * @return Das geparste und Ã¼berprÃ¼fte Sudoku
+ */
+struct sudoku getSudokuFromFile(char path[1024], int *error) {
+    struct sudoku sudoku;
+    FILE *fileHandle;
+    if (verifyFilePath(path) == 1) {
+        *error = PARSER_VALID;
+        fileHandle = fopen(path, "r");
+        sudoku = parseToSudoku(fileHandle, error);
+    } else {
+        *error = PARSER_FILE_INACCESSIBLE;
+    }
+
+    return sudoku;
+}
+
+/**
+ * LieÃŸt und parsed eine Datei in ein Sudoku.
+ *
+ * @param dateiHandle
+ * @param errorCode
+ *
+ * @return geparstesSudoku
+ */
+struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
+    struct sudoku sudoku;
+    int i,j;
+    for (i = 0; i < 9; i++) {
+        // Lese eine Zeile der Datei aus, und fÃ¼lle die entsprechende Zeile
+        // im Sudoku
+        fscanf(
+            fileHandle,
+            "%i,%i,%i,%i,%i,%i,%i,%i,%i",
+            &sudoku.value[i][0],
+            &sudoku.value[i][1],
+            &sudoku.value[i][2],
+            &sudoku.value[i][3],
+            &sudoku.value[i][4],
+            &sudoku.value[i][5],
+            &sudoku.value[i][6],
+            &sudoku.value[i][7],
+            &sudoku.value[i][8]
+        );
+    };
+
+    for (i = 0; i < 9; i++) {
+        for (j = 0; j < 9; j++) {
+            sudoku.generated[i][j] = 1;
+        }
+    }
+
+    *error = checkParsedSudoku(sudoku);
+
+    return sudoku;
+}
+
+/**
+ * ÃœberprÃ¼ft ob das Sudoku nur Zahlen von (einschlieÃŸlich)
+ * 1 bis 9 enthÃ¤lt. ÃœberprÃ¼ft des Weiteren ob sudoku.generated nur 1 enthÃ¤lt.
+ *
+ * @param sudoku Sudoku to check
+ *
+ * @return Eine PARSER_* Konstante die den Fehlercode angibt.
+ */
+int checkParsedSudoku(struct sudoku sudoku) {
+    int i, j, value = 0, generated = 0;
+    int isError = PARSER_VALID;
+    for (i = 0; i < 9; i++) {
+        for (j = 0; j < 9; j++) {
+            value = sudoku.value[i][j];
+            generated = sudoku.generated[i][j];
+            if (value < 1 || value > 9 || generated != 1) {
+                isError = PARSER_SUDOKU_NUMBERS_INVALID;
+            }
+        }
+    }
+    return isError;
+}
+
+/**
+ * Zeigt eine Fehlernachricht entsprechend ihrer Bedeutung an.
+ *
+ * @param errorCode Fehlercode, zu welchem eine Nachricht darzustellen ist.
+ */
+void showParserErrorMessage(int errorCode) {
+    switch (errorCode) {
+        case (PARSER_FILE_INACCESSIBLE):
+            printf("Die angegebene Datei existiert nicht, oder auf sie kann nicht zugegriffen werden.\n");
+            printf("Bitte ueberpruefen sie ihre Eingabe und versuchen es erneut!\n\n");
+            break;
+
+        case (PARSER_SUDOKU_NUMBERS_INVALID):
+            printf("Die Datei enthaelt ungueltigen Eingaben.");
+            printf("Sie sollte neun Reihen enthalten,\nwelche wie folgt aufgebaut sein sollten:\n");
+            printf("\"i,i,i,i,i,i,i,i,i\" (i steht fuer eine beliebige Zahl von 1-9)\n\n");
+            break;
+
+        case (PARSER_SUDOKU_INVALID):
+            printf("Das Sudoku ist kein gueltiges Sudoku.\n");
+            printf("Die Zahlen in einer Reihe, Zeile und in einem 3x3 Quadrat muessen einmalig sein.\n\n");
+            break;
+    }
+    return;
+}
+
+/**
+ * Verifizieret ob dateiPfad eine lesbare Datei identifiziert.
+ *
+ * @param dateiPfad
+ *
+ * @return 1 wenn der Pfad
+ */
+int verifyFilePath(char path[1024]) {
+    int success;
+    FILE *fileHandle;
+    fileHandle = fopen(path, "r");
+
+    if (fileHandle == NULL) {
+        success = 0;
+    } else {
+        success = 1;
+    }
+
+    return success;
 }
