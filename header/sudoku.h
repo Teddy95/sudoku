@@ -9,7 +9,7 @@
 #include "../header/displayTime.h"
 #include "../header/views.h"
 
-// Definition von Konstaten für den Schwierigkeitsgrad
+// Definition von Konstaten fÃ¼r den Schwierigkeitsgrad
 #define EASY 1
 #define MEDIUM 2
 #define DIFFICULT 3
@@ -20,7 +20,7 @@
 #define PARSER_SUDOKU_NUMBERS_INVALID 2 //! Sudoku enthielt falsch Eingaben.
 #define PARSER_SUDOKU_INVALID 3
 
-// Definition von Konstaten für die Views
+// Definition von Konstaten fÃ¼r die Views
 #define VIEW_HOME 0
 #define VIEW_GAME_NEW 1
 #define VIEW_GAME_LOAD 2
@@ -30,17 +30,17 @@
 #define VIEW_EXIT 6
 #define VIEW_GAME_READ 7
 
-// Definition von Konstante für maximale Zeichenkettenlänge
+// Definition von Konstante fÃ¼r maximale ZeichenkettenlÃ¤nge
 #define STRLEN 1024
 
-// Definition von horizontaler sowie vertikaler Sudoku-Größe
+// Definition von horizontaler sowie vertikaler Sudoku-GrÃ¶ÃŸe
 #define SIZE 9
 
 
 // Sudoku-Gitter
 struct sudoku {
     int value[9][9];     // Werte im Sudoku
-    int generated[9][9]; // 1 = Wert kann nicht geändert werden, 0 = Wert kann geändert werden
+    int generated[9][9]; // 1 = Wert kann nicht geÃ¤ndert werden, 0 = Wert kann geÃ¤ndert werden
 };
 
 // Koordinaten eines Feldes im Sudoku-Gitter
@@ -49,7 +49,7 @@ struct field {
     int column;
 };
 
-// Struktur für einen gespeicherten Spielstand
+// Struktur fÃ¼r einen gespeicherten Spielstand
 struct savegame {
     struct sudoku sudokuGridSolved;
     struct sudoku sudokuGrid;
@@ -61,55 +61,6 @@ int checkSavegameSlot(int slot);
 struct savegame readSavegame(int slot, int *error);
 int writeSavegame(struct savegame sudoku, int slot);
 void deleteSavegame(int slot);
-
-
-/**
- * Ließt, intepretiert und überprüft eine Datei in ein Sudoku
- * Diese Funktion in den Views nutzen!
- *
- * @param detaiPfad
- * @param errorCode
- *
- * @return Das geparste und überprüfte Sudoku
- */
-struct sudoku getSudokuFromFile(char[1024], int*);
-
-/**
- * Ließt und parsed eine Datei in ein Sudoku.
- *
- * @param dateiHandle
- * @param errorCode
- *
- * @return geparstesSudoku
- */
-struct sudoku parseToSudoku(FILE*, int*);
-
-/**
- * Verifizieret ob dateiPfad eine lesbare Datei identifiziert.
- *
- * @param dateiPfad
- *
- * @return 1 wenn der Pfad
- */
-int verifyFilePath(char[1024]);
-
-/**
- * Überprüft ob das Sudoku nur Zahlen von (einschließlich)
- * 1 bis 9 enthält. Überprüft des Weiteren ob sudoku.generated nur 1 enthält.
- *
- * @param sudoku Sudoku to check
- *
- * @return Eine PARSER_* Konstante die den Fehlercode angibt.
- */
-int checkParsedSudoku(struct sudoku);
-
-/**
- * Zeigt eine Fehlernachricht entsprechend ihrer Bedeutung an.
- *
- * @param errorCode Fehlercode, zu welchem eine Nachricht darzustellen ist.
- */
-void showParserErrorMessage(int);
-
 // Funktionsprototypen (Funktionsbeschreibungen jeweils an den Funktionen)
 // Funktionen zum Initialisieren und Terminieren
 void init();
@@ -126,13 +77,13 @@ struct sudoku shuffleColumns(struct sudoku sudokuGrid);
 void swap(int *x, int *y);
 struct sudoku swapRows(struct sudoku sudokuGrid, int quadrant, int x, int y);
 struct sudoku swapColumns(struct sudoku sudokuGrid, int quadrant, int x, int y);
-// Funktionen zum Prüfen des Sudokus
+// Funktionen zum PrÃ¼fen des Sudokus
 int checkSudoku(struct sudoku sudokuGrid);
 int checkValue(struct sudoku sudokuGrid, struct field field);
 int checkRow(struct sudoku sudokuGrid, struct field field);
 int checkColumn(struct sudoku sudokuGrid, struct field field);
 int checkGroup(struct sudoku sudokuGrid, struct field field);
-// Funktionen zum prüfen und Konvertieren von Eingaben
+// Funktionen zum prÃ¼fen und Konvertieren von Eingaben
 int charToInt(char charakter);
 int checkAndConvertInputToInt(char inputString[]);
 int checkAndConvertInputChar(char inputString[]);
@@ -141,5 +92,11 @@ void readLine(char inputString[]);
 struct sudoku alterValue(struct sudoku sudokuGrid, struct field field, int newValue, int *error);
 struct sudoku fillRandomField(struct sudoku sudokuGridSolved, struct sudoku sudokuGrid);
 int countEmptyFields(struct sudoku sudokuGrid);
+// File parsing for custom sudoku
+struct sudoku getSudokuFromFile(char[1024], int*);
+struct sudoku parseToSudoku(FILE*, int*);
+int checkParsedSudoku(struct sudoku);
+void showParserErrorMessage(int);
+int verifyFilePath(char[1024]);
 
 #endif // SUDOKU_H_INCLUDED
