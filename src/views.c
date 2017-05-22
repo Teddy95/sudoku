@@ -534,9 +534,9 @@ int viewGameSave(struct savegame sudoku) {
 /**
  * Funktion:        viewGameReadFromSudokuFile
  *
- * R�ckgabewert:    xxx
+ * R�ckgabewert:    Gibt VIEW_HOME zur�ck
  *
- * Beschreibung:    xxx.
+ * Beschreibung:    Zeigt den Bildschirm an, um ein eigenes Sudoku einzulesen.
  */
 int viewGameReadFromSudokuFile() {
     struct savegame sudoku;
