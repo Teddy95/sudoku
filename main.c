@@ -3,13 +3,14 @@
  *
  * Funktionsumfang:
  *
- * - Zufällig generiertes Sudoku nach Schwierigkeitsgrad
- * - Timer mit bislang benötigter Spielzeit nach jedem Zug und am Ende des Spiels
+ * - ZufÃ¤llig generiertes Sudoku nach Schwierigkeitsgrad
+ * - Timer mit bislang benÃ¶tigter Spielzeit nach jedem Zug und am Ende des Spiels
  * - Sudoku kann in einem Slot gespeichert werden (.skram-Datei)
  * - Sudoku kann aus einem Slot geladen und fortgesetzt werden (.skram-Datei)
- * - Während dem Spielen kann man mit der Tipp-Funktion ein zufällig gewähltes Feld automatisch füllen lassen
- * - Nach jedem Zug wird das Sudoku im Hintergrund geprüft
- * - Sobald das Sudoku vollständig und korrekt gelöst wurde, wird eine entsprechende Nachricht angezeigt
+ * - WÃ¤hrend dem Spielen kann man mit der Tipp-Funktion ein zufÃ¤llig gewÃ¤hltes Feld automatisch fÃ¼llen lassen
+ * - Nach jedem Zug wird das Sudoku im Hintergrund geprÃ¼ft
+ * - Sobald das Sudoku vollstÃ¤ndig und korrekt gelÃ¶st wurde, wird eine entsprechende Nachricht angezeigt
+ * - Eigenes Sudoku kann aus einer beliebigen Textdatei eingelesen werden
  *
  * Kompiliert mit: MinGW
  * Getestet auf OS: Windows 10
