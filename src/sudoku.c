@@ -918,7 +918,7 @@ void showParserErrorMessage(int errorCode) {
     switch (errorCode) {
         case (PARSER_FILE_INACCESSIBLE):
             printf("Die angegebene Datei existiert nicht, oder auf sie kann nicht zugegriffen werden.\n");
-            printf("Bitte ueberpruefen sie ihre Eingabe und versuchen es erneut!\n\n");
+            printf("Bitte ueberpruefen sie Ihre Eingabe und versuchen es erneut!\n\n");
             break;
 
         case (PARSER_SUDOKU_NUMBERS_INVALID):

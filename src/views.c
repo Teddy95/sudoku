@@ -575,10 +575,14 @@ int viewGameReadFromSudokuFile() {
             printf("\n");
             printf("Sudoku aus Datei laden\n");
             printf("\n");
-            printf("Bitte geben Sie einen Schwierigkeits an.\n");
+            printf("Bitte geben Sie einen Schwierigkeits an:\n");
             printf("[1] Leicht\n");
             printf("[2] Mittel\n");
             printf("[3] Schwer\n");
+            printf("[4] Zurueck zum Startbildschirm\n");
+            printf("\n");
+            printf("Eingabe: ");
+
             readLine(difficultyInputString);
             difficultyInput = checkAndConvertInputToInt(difficultyInputString);
 
@@ -591,6 +595,9 @@ int viewGameReadFromSudokuFile() {
                     break;
                 case 3:
                     difficulty = DIFFICULT;
+                    break;
+                case 4:
+                    return VIEW_HOME;
                     break;
             }
         } while (difficulty != EASY
