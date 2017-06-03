@@ -6,8 +6,9 @@
 #include <time.h>
 #include <windows.h>
 #include <math.h>
-#include "../header/displayTime.h"
-#include "../header/views.h"
+#include <ctype.h>
+#include <conio.h>
+
 
 // Definition von Konstaten für den Schwierigkeitsgrad
 #define EASY 1
@@ -98,5 +99,8 @@ struct sudoku parseToSudoku(FILE*, int*);
 int checkParsedSudoku(struct sudoku);
 void showParserErrorMessage(int);
 int verifyFilePath(char[1024]);
+
+#include "displayTime.h"
+#include "views.h"
 
 #endif // SUDOKU_H_INCLUDED

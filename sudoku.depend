@@ -53,30 +53,34 @@
 1495382430 source:e:\downloads\sudoku-master\sudoku-master\main.c
 	"header/sudoku.h"
 
-1495382430 source:e:\programming\school\sudoku\main.c
+1496492936 source:e:\programming\school\sudoku\main.c
 	"header/sudoku.h"
 
-1495384668 e:\programming\school\sudoku\header\sudoku.h
+1496497344 e:\programming\school\sudoku\header\sudoku.h
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
 	<windows.h>
 	<math.h>
-	"../header/displayTime.h"
-	"../header/views.h"
+	<ctype.h>
+	<conio.h>
+	"displayTime.h"
+	"views.h"
 
 1495381378 e:\programming\school\sudoku\header\displaytime.h
 	<math.h>
 
-1495384452 e:\programming\school\sudoku\header\views.h
-	"../header/sudoku.h"
+1496497289 e:\programming\school\sudoku\header\views.h
+	<stdio.h>
+	<stdlib.h>
+	"sudoku.h"
 
 1495381384 source:e:\programming\school\sudoku\src\displaytime.c
 	"../header/displayTime.h"
 
-1495384384 source:e:\programming\school\sudoku\src\sudoku.c
+1496492936 source:e:\programming\school\sudoku\src\sudoku.c
 	"../header/sudoku.h"
 
-1495391450 source:e:\programming\school\sudoku\src\views.c
+1496492936 source:e:\programming\school\sudoku\src\views.c
 	"../header/views.h"
 
