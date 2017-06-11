@@ -839,6 +839,7 @@ struct sudoku getSudokuFromFile(char path[1024], int *error) {
         *error = PARSER_VALID;
         fileHandle = fopen(path, "r");
         sudoku = parseToSudoku(fileHandle, error);
+        fclose(fileHandle);
     } else {
         *error = PARSER_FILE_INACCESSIBLE;
     }
