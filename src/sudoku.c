@@ -858,8 +858,8 @@ struct sudoku parseToSudoku(FILE *fileHandle, int *error) {
     struct sudoku sudoku;
     int i,j;
     for (i = 0; i < 9; i++) {
-        // Lese eine Zeile der Datei aus, und fülle die entsprechende Zeile
-        // im Sudoku
+        // Lese eine Zeile der Datei aus, und
+        // fülle die entsprechende Zeile  im Sudoku
         fscanf(
             fileHandle,
             "%i,%i,%i,%i,%i,%i,%i,%i,%i",
@@ -943,15 +943,16 @@ void showParserErrorMessage(int errorCode) {
  * @return 1 wenn der Pfad
  */
 int verifyFilePath(char path[1024]) {
-    int success;
+    int fileExists;
     FILE *fileHandle;
     fileHandle = fopen(path, "r");
 
     if (fileHandle == NULL) {
-        success = 0;
+        fileExists = 0;
     } else {
-        success = 1;
+        fileExists = 1;
+        fclose(fileHandle)
     }
 
-    return success;
+    return fileExists;
 }
