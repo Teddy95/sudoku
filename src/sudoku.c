@@ -951,7 +951,7 @@ int verifyFilePath(char path[1024]) {
         fileExists = 0;
     } else {
         fileExists = 1;
-        fclose(fileHandle)
+        fclose(fileHandle);
     }
 
     return fileExists;
